@@ -35,12 +35,12 @@ export function Navbar() {
             Bridal Make Up
           </span>
         </a>
-        <ul className="hidden items-center gap-9 md:flex">
+        <ul className="hidden items-center gap-8 md:flex">
           {links.map((l) => (
             <li key={l.href}>
               <a
                 href={l.href}
-                className="text-[13px] tracking-wide text-foreground/80 transition-colors hover:text-foreground"
+                className="text-[15px] font-medium text-foreground/75 transition-colors hover:text-foreground"
               >
                 {l.label}
               </a>
@@ -49,7 +49,7 @@ export function Navbar() {
         </ul>
         <a
           href="#booking"
-          className="hidden rounded-full border border-foreground/80 px-5 py-2 text-xs uppercase tracking-[0.2em] text-foreground transition-colors hover:bg-foreground hover:text-background md:inline-block"
+          className="hidden rounded-full border border-foreground px-5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-foreground hover:text-background md:inline-block"
         >
           Đặt lịch
         </a>
