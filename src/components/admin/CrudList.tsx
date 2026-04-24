@@ -34,7 +34,7 @@ export function CrudList<T extends Record<string, any>>({
     queryFn: async () => {
       const { data, error } = await supabase.from(table as any).select("*").order("sort_order");
       if (error) throw error;
-      return (data ?? []) as T[];
+      return (data ?? []) as unknown as T[];
     },
   });
 
