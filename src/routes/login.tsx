@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/login")({
@@ -11,24 +12,35 @@ export const Route = createFileRoute("/login")({
 function LoginPage() {
   const { signIn, user, loading } = useAuth();
   const navigate = useNavigate();
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  if (!loading && user) {
-    navigate({ to: "/admin" });
-  }
+  useEffect(() => {
+    if (!loading && user) navigate({ to: "/admin" });
+  }, [user, loading, navigate]);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    const { error } = await signIn(email, password);
-    setSubmitting(false);
-    if (error) {
-      toast.error(error);
-    } else {
+    if (mode === "signin") {
+      const { error } = await signIn(email, password);
+      setSubmitting(false);
+      if (error) return toast.error(error);
       toast.success("Đăng nhập thành công");
       navigate({ to: "/admin" });
+    } else {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: `${window.location.origin}/admin` },
+      });
+      setSubmitting(false);
+      if (error) return toast.error(error.message);
+      toast.success("Tạo tài khoản thành công. Đang đăng nhập...");
+      const { error: signInError } = await signIn(email, password);
+      if (!signInError) navigate({ to: "/admin" });
     }
   };
 
@@ -42,40 +54,40 @@ function LoginPage() {
           Admin Panel
         </p>
 
-        <div className="mt-10 space-y-5">
+        <div className="mt-8 flex justify-center gap-6 text-xs uppercase tracking-[0.25em]">
+          <button type="button" onClick={() => setMode("signin")}
+            className={mode === "signin" ? "text-foreground border-b border-rose pb-1" : "text-muted-foreground"}>
+            Đăng nhập
+          </button>
+          <button type="button" onClick={() => setMode("signup")}
+            className={mode === "signup" ? "text-foreground border-b border-rose pb-1" : "text-muted-foreground"}>
+            Tạo tài khoản
+          </button>
+        </div>
+
+        <div className="mt-8 space-y-5">
           <label className="block">
             <span className="text-[11px] uppercase tracking-[0.3em] text-muted-foreground">Email</span>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-2 w-full border-0 border-b border-border bg-transparent py-3 outline-none focus:border-rose"
-            />
+            <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
+              className="mt-2 w-full border-0 border-b border-border bg-transparent py-3 outline-none focus:border-rose" />
           </label>
           <label className="block">
             <span className="text-[11px] uppercase tracking-[0.3em] text-muted-foreground">Mật khẩu</span>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-2 w-full border-0 border-b border-border bg-transparent py-3 outline-none focus:border-rose"
-            />
+            <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)}
+              className="mt-2 w-full border-0 border-b border-border bg-transparent py-3 outline-none focus:border-rose" />
           </label>
         </div>
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="mt-10 w-full bg-foreground px-8 py-4 text-xs uppercase tracking-[0.3em] text-background hover:bg-foreground/90 disabled:opacity-50"
-        >
-          {submitting ? "Đang đăng nhập..." : "Đăng nhập"}
+        <button type="submit" disabled={submitting}
+          className="mt-10 w-full bg-foreground px-8 py-4 text-xs uppercase tracking-[0.3em] text-background hover:bg-foreground/90 disabled:opacity-50">
+          {submitting ? "Đang xử lý..." : mode === "signin" ? "Đăng nhập" : "Tạo tài khoản"}
         </button>
 
-        <p className="mt-6 text-center text-xs text-muted-foreground">
-          Tài khoản admin được tạo trong Lovable Cloud.
-        </p>
+        {mode === "signup" && (
+          <p className="mt-4 text-center text-[11px] text-muted-foreground">
+            Tài khoản đầu tiên đăng ký sẽ tự động trở thành Admin.
+          </p>
+        )}
       </form>
     </main>
   );
