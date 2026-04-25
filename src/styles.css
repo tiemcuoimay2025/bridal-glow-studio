@@ -160,10 +160,11 @@
     letter-spacing: 0.01em;
   }
 
-  h1, h2, h3, h4, .font-serif {
-    font-family: var(--font-serif);
-    font-weight: 400;
-    letter-spacing: -0.01em;
+  h1, h2, h3, h4, .font-serif, .font-display {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: none;
   }
 }
 
@@ -171,25 +172,25 @@
   .text-balance { text-wrap: balance; }
   .gradient-luxury {
     background: linear-gradient(135deg,
-      oklch(0.985 0.008 80) 0%,
-      oklch(0.93 0.025 30) 50%,
-      oklch(0.9 0.04 15) 100%);
+      oklch(1 0 0) 0%,
+      oklch(0.96 0 0) 50%,
+      oklch(0.9 0 0) 100%);
   }
   .text-gradient-rose {
-    background: linear-gradient(135deg, oklch(0.55 0.09 20), oklch(0.42 0.045 25));
+    background: linear-gradient(135deg, oklch(0.15 0 0), oklch(0.45 0 0));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
   .shadow-luxury {
-    box-shadow: 0 30px 60px -30px oklch(0.42 0.045 25 / 0.25);
+    box-shadow: 0 30px 60px -30px oklch(0.15 0 0 / 0.25);
   }
   .divider-ornament::before,
   .divider-ornament::after {
     content: "";
     flex: 1;
     height: 1px;
-    background: linear-gradient(to right, transparent, oklch(0.42 0.045 25 / 0.3), transparent);
+    background: linear-gradient(to right, transparent, oklch(0.15 0 0 / 0.3), transparent);
   }
   .divider-ornament {
     display: flex;
